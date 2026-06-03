@@ -14,6 +14,9 @@ export function RecentTransactions({ transactions }: { transactions: Transaction
       <div className="rounded-lg border bg-white p-6 shadow-sm">
         <h3 className="mb-2 font-semibold">Transacciones recientes</h3>
         <p className="text-sm text-gray-500">Aún no hay transacciones.</p>
+        <a href="/transactions" className="text-[10px] font-mono text-amber-600 no-underline hover:text-amber-700 transition-colors mt-3 inline-block">
+          Ver historial completo &rarr;
+        </a>
       </div>
     );
   }
@@ -37,6 +40,9 @@ export function RecentTransactions({ transactions }: { transactions: Transaction
           </div>
         ))}
       </div>
+      <a href="/transactions" className="text-[10px] font-mono text-amber-600 no-underline hover:text-amber-700 transition-colors mt-3 inline-block">
+        Ver historial completo &rarr;
+      </a>
     </div>
   );
 }

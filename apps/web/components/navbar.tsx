@@ -2,7 +2,7 @@
 
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
 
-export function Navbar({ active }: { active?: 'dashboard' | 'sdk' | 'credits' | 'rules' }) {
+export function Navbar({ active }: { active?: 'dashboard' | 'sdk' | 'credits' | 'rules' | 'transactions' }) {
   return (
     <nav className="flex items-center justify-between px-8 py-3.5 max-w-[1080px] mx-auto">
       <a href="/" className="text-base font-extrabold text-slate-900 no-underline tracking-tight font-sans">open402</a>
@@ -23,12 +23,6 @@ export function Navbar({ active }: { active?: 'dashboard' | 'sdk' | 'credits' | 
             Dashboard
           </a>
           <a
-            href="/sdk"
-            className={`text-xs font-mono font-semibold no-underline ${active === 'sdk' ? 'text-amber-500' : 'text-slate-500 hover:text-slate-800'} transition-colors`}
-          >
-            SDK
-          </a>
-          <a
             href="/credits"
             className={`text-xs font-mono font-semibold no-underline ${active === 'credits' ? 'text-amber-500' : 'text-slate-500 hover:text-slate-800'} transition-colors`}
           >
@@ -39,6 +33,18 @@ export function Navbar({ active }: { active?: 'dashboard' | 'sdk' | 'credits' | 
             className={`text-xs font-mono font-semibold no-underline ${active === 'rules' ? 'text-amber-500' : 'text-slate-500 hover:text-slate-800'} transition-colors`}
           >
             Reglas
+          </a>
+          <a
+            href="/transactions"
+            className={`text-xs font-mono font-semibold no-underline ${active === 'transactions' ? 'text-amber-500' : 'text-slate-500 hover:text-slate-800'} transition-colors`}
+          >
+            Historial
+          </a>
+          <a
+            href="/sdk"
+            className={`text-xs font-mono font-semibold no-underline ${active === 'sdk' ? 'text-amber-500' : 'text-slate-500 hover:text-slate-800'} transition-colors`}
+          >
+            SDK
           </a>
           <UserButton afterSignOutUrl="/" />
         </SignedIn>

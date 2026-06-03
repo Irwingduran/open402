@@ -45,7 +45,7 @@ export default async function DashboardPage() {
         <h2 className="text-3xl font-extrabold tracking-tight italic mb-10">Dashboard</h2>
         <div className="space-y-8">
           <CreditBalanceCard credits={user.credits} />
-          <AgentList agents={user.agents} />
+          <AgentList initialAgents={user.agents} />
           <RecentTransactions transactions={user.transactions} />
         </div>
       </main>
