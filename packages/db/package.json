@@ -15,7 +15,7 @@
     "generate": "prisma generate",
     "push": "prisma db push",
     "studio": "prisma studio",
-    "build": "tsup src/index.ts --format esm --dts",
+    "build": "prisma generate && tsup src/index.ts --format esm --dts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
