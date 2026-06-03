@@ -2,6 +2,7 @@ import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import { prisma } from '@open402/db';
 import { Navbar } from '../../components/navbar';
+import { TransactionFilters } from '../../components/transaction-filters';
 
 export const dynamic = 'force-dynamic';
 
@@ -48,23 +49,6 @@ export default async function TransactionsPage({
     cancelled: 'bg-slate-50 text-slate-400 border-slate-200',
   };
 
-  const typeOptions = [
-    { value: '', label: 'Todos' },
-    { value: 'credit_purchase', label: 'Compra de créditos' },
-    { value: 'credit_deduction', label: 'Deducción' },
-    { value: 'x402_payment', label: 'Pago x402' },
-    { value: 'bill_payment', label: 'Pago de servicio' },
-  ];
-
-  const statusOptions = [
-    { value: '', label: 'Todos' },
-    { value: 'completed', label: 'Completado' },
-    { value: 'pending', label: 'Pendiente' },
-    { value: 'executing', label: 'Ejecutando' },
-    { value: 'failed', label: 'Fallido' },
-    { value: 'cancelled', label: 'Cancelado' },
-  ];
-
   return (
     <div className="bg-white text-slate-800 font-sans min-h-screen overflow-x-hidden">
       <Navbar active="dashboard" />
@@ -74,24 +58,7 @@ export default async function TransactionsPage({
           <p className="text-xs font-mono text-slate-400">{total} transacciones</p>
         </div>
 
-        {/* Filters */}
-        <form className="flex flex-wrap gap-3 mb-8">
-          <select name="type" value={typeFilter ?? ''} onChange={(e) => { const form = e.target.form; if (form) form.submit(); }}
-            className="text-xs font-mono px-3 py-2 rounded-lg border border-black/10 bg-white text-slate-700"
-          >
-            {typeOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-          </select>
-          <select name="status" value={statusFilter ?? ''} onChange={(e) => { const form = e.target.form; if (form) form.submit(); }}
-            className="text-xs font-mono px-3 py-2 rounded-lg border border-black/10 bg-white text-slate-700"
-          >
-            {statusOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-          </select>
-          {(typeFilter || statusFilter) && (
-            <a href="/transactions" className="text-[10px] font-mono text-amber-600 no-underline hover:text-amber-700 transition-colors self-center">
-              Limpiar filtros
-            </a>
-          )}
-        </form>
+        <TransactionFilters type={typeFilter} status={statusFilter} />
 
         {/* Table */}
         {transactions.length === 0 ? (
