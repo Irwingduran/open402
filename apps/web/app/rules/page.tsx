@@ -17,7 +17,7 @@ export default async function RulesPage() {
 
   return (
     <div className="bg-white text-slate-800 font-sans min-h-screen overflow-x-hidden">
-      <Navbar active="rules" />
+      <Navbar active="dashboard" />
       <main className="px-8 py-10 max-w-[1080px] mx-auto">
         <h2 className="text-3xl font-extrabold tracking-tight italic mb-3">Reglas de gasto</h2>
         <RulesManager initialRules={rules} />
