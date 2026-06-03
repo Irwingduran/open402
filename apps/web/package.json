@@ -1,0 +1,30 @@
+{
+  "name": "@open402/web",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@open402/db": "workspace:*",
+    "@open402/agents": "workspace:*",
+    "@clerk/nextjs": "^5.0.0",
+    "@coinbase/agentkit": "^0.2.3",
+    "next": "^14.2.0",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "svix": "^1.95.1",
+    "tailwindcss": "^3.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "autoprefixer": "^10.5.0",
+    "typescript": "^5.5.0"
+  }
+}
