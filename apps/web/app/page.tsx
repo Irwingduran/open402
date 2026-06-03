@@ -218,7 +218,7 @@ export default function Home() {
 
           <div className="relative grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
             <div className="absolute top-[19px] left-[8%] right-[8%] h-px" style={{ background: 'rgba(245,158,11,0.2)' }} />
-            <FlowStep step="01" title="Cargas créditos" sub="Tarjeta MXN via Conekta o SPEI" color="#f59e0b" delay={0} />
+            <FlowStep step="01" title="Cargas créditos" sub="SPEI via Bitso — sin tarjeta, sin crypto" color="#f59e0b" delay={0} />
             <FlowStep step="02" title="Backend convierte" sub="MXN → USDC en Arbitrum via Bitso" color="#3b82f6" delay={120} />
             <FlowStep step="03" title="Agente actúa" sub="Claude interpreta el intent" color="#8b5cf6" delay={240} />
             <FlowStep step="04" title="Pago ejecutado" sub="x402 API o Prontipagos (CFE, Telmex...)" color="#22c55e" delay={360} />
@@ -436,7 +436,7 @@ await agent.payService({
       <div className="border-t border-black/5 px-8 py-6 text-center bg-slate-50">
         <p className="text-[10px] text-slate-400 font-mono tracking-widest mb-3.5">CONSTRUIDO SOBRE</p>
         <div className="flex items-center justify-center gap-7 flex-wrap">
-          {['Arbitrum One', 'Coinbase CDP', 'x402 Protocol', 'Prontipagos', 'Conekta', 'Bitso FXaaS', 'Linux Foundation'].map(t => (
+          {['Arbitrum One', 'Coinbase CDP', 'x402 Protocol', 'Prontipagos', 'Bitso FXaaS', 'Linux Foundation'].map(t => (
             <span key={t} className="text-[11px] font-mono font-semibold text-slate-500">{t}</span>
           ))}
         </div>

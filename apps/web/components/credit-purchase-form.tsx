@@ -3,8 +3,7 @@
 import { useState } from 'react';
 
 export function CreditPurchaseForm() {
-  const [amount, setAmount] = useState(100);
-  const [method, setMethod] = useState<'card' | 'oxxo' | 'spei'>('card');
+  const [amount, setAmount] = useState(500);
   const [loading, setLoading] = useState(false);
 
   const estimatedCredits = amount * 100;
@@ -16,7 +15,7 @@ export function CreditPurchaseForm() {
       const res = await fetch('/api/credits/purchase', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amountMXN: amount, paymentMethod: method }),
+        body: JSON.stringify({ amountMXN: amount, paymentMethod: 'spei' }),
       });
       const data = await res.json();
       if (data.success) {
@@ -32,42 +31,43 @@ export function CreditPurchaseForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border bg-white p-6 shadow-sm">
+    <form onSubmit={handleSubmit} className="space-y-5 rounded-xl border border-black/10 bg-white p-6">
       <div>
-        <label className="block text-sm font-medium">Monto en MXN</label>
+        <label className="text-xs font-mono text-slate-500 block mb-1.5">Monto en MXN</label>
         <input
           type="number"
           min={50}
           max={10000}
           value={amount}
           onChange={(e) => setAmount(Number(e.target.value))}
-          className="mt-1 w-full rounded border px-3 py-2 text-sm"
+          className="w-full text-sm font-mono px-3 py-2.5 rounded-lg border border-black/10 bg-white text-slate-700"
         />
       </div>
 
-      <div>
-        <label className="block text-sm font-medium">Método de pago</label>
-        <select
-          value={method}
-          onChange={(e) => setMethod(e.target.value as typeof method)}
-          className="mt-1 w-full rounded border px-3 py-2 text-sm"
-        >
-          <option value="card">Tarjeta (Conekta)</option>
-          <option value="oxxo">OXXO</option>
-          <option value="spei">SPEI</option>
-        </select>
+      <div className="rounded-lg bg-amber-50 border border-amber-200 px-4 py-3">
+        <p className="text-xs font-mono text-amber-800">
+          Pago vía SPEI — Bitso
+        </p>
+        <p className="text-[10px] text-amber-700 mt-1 leading-relaxed">
+          Transfiere el monto a la CLABE de Bitso que aparece al confirmar. Los créditos se acreditan automáticamente al recibir el pago.
+        </p>
       </div>
 
-      <p className="text-sm text-gray-600">
-        Recibirás aproximadamente <strong>{estimatedCredits.toLocaleString()} créditos</strong>
-      </p>
+      <div className="border-t border-black/5 pt-4">
+        <p className="text-sm text-slate-700">
+          Recibirás <strong className="text-amber-600">{estimatedCredits.toLocaleString()} créditos</strong>
+        </p>
+        <p className="text-[10px] font-mono text-slate-400 mt-0.5">
+          1 crédito ≈ $0.01 USD · 1 MXN = 100 créditos
+        </p>
+      </div>
 
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-lg bg-black px-4 py-2 text-sm text-white hover:bg-gray-800 disabled:opacity-50"
+        className="w-full text-xs font-mono font-bold px-4 py-2.5 rounded-lg bg-slate-900 text-white border-none cursor-pointer hover:bg-slate-800 transition-colors disabled:opacity-50"
       >
-        {loading ? 'Procesando...' : 'Comprar créditos'}
+        {loading ? 'Procesando...' : 'Generar instrucciones SPEI'}
       </button>
     </form>
   );

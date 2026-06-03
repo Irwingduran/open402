@@ -9,7 +9,7 @@ export async function POST(req: Request) {
     return Response.json({ error: 'No autorizado' }, { status: 401 });
   }
 
-  const { amountMXN, paymentMethod } = await req.json();
+  const { amountMXN } = await req.json();
 
   if (amountMXN < 50 || amountMXN > 10000) {
     return Response.json({ error: 'Monto debe estar entre 50 y 10,000 MXN' }, { status: 400 });
@@ -24,8 +24,8 @@ export async function POST(req: Request) {
       status: 'pending',
       amount: creditsAmount,
       currency: 'credits',
-      description: `Compra de ${creditsAmount} créditos por $${amountMXN} MXN vía ${paymentMethod}`,
-      metadata: { amountMXN, paymentMethod, exchangeRate: EXCHANGE_RATE },
+      description: `Compra de ${creditsAmount} créditos por $${amountMXN} MXN vía SPEI (Bitso)`,
+      metadata: { amountMXN, exchangeRate: EXCHANGE_RATE },
     },
   });
 
