@@ -1,5 +1,5 @@
 import { auth, clerkClient } from '@clerk/nextjs/server';
-import { prisma } from '@open402/db';
+import { prisma } from '@/lib/prisma';
 
 export async function POST(req: Request) {
   const { userId } = await auth();

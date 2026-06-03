@@ -1,4 +1,4 @@
-import type { Transaction } from '@open402/db';
+import type { Transaction } from '@/lib/prisma';
 
 const statusColors: Record<string, string> = {
   completed: 'text-green-600 bg-green-50',

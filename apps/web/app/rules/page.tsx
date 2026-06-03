@@ -1,6 +1,6 @@
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
-import { prisma } from '@open402/db';
+import { prisma } from '@/lib/prisma';
 import { Navbar } from '../../components/navbar';
 import { RulesManager } from '../../components/rules-manager';
 

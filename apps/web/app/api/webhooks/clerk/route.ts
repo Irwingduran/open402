@@ -1,6 +1,6 @@
 import { Webhook } from 'svix';
 import { headers } from 'next/headers';
-import { prisma } from '@open402/db';
+import { prisma } from '@/lib/prisma';
 import type { WebhookEvent } from '@clerk/nextjs/server';
 
 export async function POST(req: Request) {

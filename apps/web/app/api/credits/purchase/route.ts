@@ -1,5 +1,5 @@
 import { auth } from '@clerk/nextjs/server';
-import { prisma } from '@open402/db';
+import { prisma } from '@/lib/prisma';
 
 const EXCHANGE_RATE = 100;
 

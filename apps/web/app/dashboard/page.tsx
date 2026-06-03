@@ -1,6 +1,6 @@
 import { auth, clerkClient } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
-import { prisma } from '@open402/db';
+import { prisma } from '@/lib/prisma';
 import { Navbar } from '../../components/navbar';
 import { CreditBalanceCard } from '../../components/credit-balance-card';
 import { RecentTransactions } from '../../components/recent-transactions';

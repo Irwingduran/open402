@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import type { Agent } from '@open402/db';
+import type { Agent } from '@/lib/prisma';
 
 export function AgentList({ initialAgents }: { initialAgents: Agent[] }) {
   const [agents, setAgents] = useState<Agent[]>(initialAgents);

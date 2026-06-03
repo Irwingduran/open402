@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: ['@open402/agents', '@open402/db'],
+  transpilePackages: ['@open402/agents'],
   serverExternalPackages: [
     '@coinbase/agentkit',
     '@privy-io/server-auth',
