@@ -2,23 +2,6 @@ const BITSO_API_BASE = process.env.BITSO_API_URL ?? 'https://api.bitso.com/v3';
 const BITSO_API_KEY = process.env.BITSO_API_KEY ?? '';
 const BITSO_API_SECRET = process.env.BITSO_API_SECRET ?? '';
 
-interface BitsoQuoteRequest {
-  source_currency: string;
-  target_currency: string;
-  source_amount: number;
-}
-
-interface BitsoQuote {
-  id: string;
-  source_currency: string;
-  target_currency: string;
-  source_amount: number;
-  target_amount: number;
-  rate: number;
-  expires_at: string;
-  created_at: string;
-}
-
 interface BitsoDepositInstructions {
   deposit_id: string;
   clabe: string;
@@ -42,7 +25,7 @@ interface BitsoDepositStatus {
 const IS_MOCK = !BITSO_API_KEY || !BITSO_API_SECRET;
 
 function generateId(): string {
-  return `spx_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+  return `dep_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 }
 
 function sleep(ms: number): Promise<void> {
@@ -113,38 +96,9 @@ async function handleMockRequest<T>(
 ): Promise<T> {
   await sleep(300);
 
-  if (method === 'POST' && path === '/fx/rate') {
-    return {
-      source_currency: body?.source_currency ?? 'MXN',
-      target_currency: body?.target_currency ?? 'USDC',
-      rate: 0.0000485,
-      rate_inverse: 20618.56,
-      source_amount: body?.source_amount ?? 100,
-      target_amount: Math.floor((body?.source_amount as number) * 0.0000485 * 100) / 100,
-      expires_at: new Date(Date.now() + 30000).toISOString(),
-    } as T;
-  }
-
-  if (method === 'POST' && path === '/fx/quote') {
-    const rate = 0.0000485;
-    const sourceAmount = body?.source_amount as number;
-    const targetAmount = Math.floor(sourceAmount * rate * 100) / 100;
-    return {
-      id: generateId(),
-      source_currency: 'MXN',
-      target_currency: 'USDC',
-      source_amount: sourceAmount,
-      target_amount: targetAmount,
-      rate,
-      expires_at: new Date(Date.now() + 60000).toISOString(),
-      created_at: new Date().toISOString(),
-    } as T;
-  }
-
-  if (method === 'POST' && path.startsWith('/fx/quote/') && path.endsWith('/accept')) {
-    const quoteId = path.split('/')[3];
-    const depositId = `dep_${Date.now()}`;
+  if (method === 'POST' && path === '/mxnb/deposit') {
     const amount = (body?.source_amount as number) ?? 100;
+    const depositId = generateId();
     const status: BitsoDepositStatus = {
       deposit_id: depositId,
       status: 'pending',
@@ -160,12 +114,12 @@ async function handleMockRequest<T>(
       reference: `OPEN${String(Date.now()).slice(-8)}`,
       amount,
       currency: 'MXN',
-      concept: 'Compra de créditos open402',
+      concept: 'Compra MXNB — open402',
       expires_at: new Date(Date.now() + 86400000).toISOString(),
     } as T;
   }
 
-  if (method === 'GET' && path.startsWith('/fx/deposit/')) {
+  if (method === 'GET' && path.startsWith('/mxnb/deposit/')) {
     const depositId = path.split('/')[3];
     const status = mockState.get(depositId);
     if (!status) {
@@ -187,56 +141,18 @@ async function handleMockRequest<T>(
 
 // --- Public API ---
 
-export async function getRate(
-  sourceCurrency: string,
-  targetCurrency: string,
-  sourceAmount: number,
-): Promise<{ rate: number; targetAmount: number; expiresAt: string }> {
-  const result = await bitsoRequest<Record<string, unknown>>('POST', '/fx/rate', {
-    source_currency: sourceCurrency,
-    target_currency: targetCurrency,
-    source_amount: sourceAmount,
-  });
-  return {
-    rate: result.rate as number,
-    targetAmount: result.target_amount as number,
-    expiresAt: result.expires_at as string,
-  };
-}
-
-export async function createQuote(
-  sourceCurrency: string,
-  targetCurrency: string,
-  sourceAmount: number,
-): Promise<BitsoQuote> {
-  const quote = await bitsoRequest<BitsoQuote>('POST', '/fx/quote', {
-    source_currency: sourceCurrency,
-    target_currency: targetCurrency,
-    source_amount: sourceAmount,
-  });
-  return quote;
-}
-
-export async function acceptQuote(
-  quoteId: string,
-  sourceAmount: number,
+export async function createMxnbDepositInstructions(
+  amountMXN: number,
 ): Promise<BitsoDepositInstructions> {
-  const instructions = await bitsoRequest<BitsoDepositInstructions>(
-    'POST',
-    `/fx/quote/${quoteId}/accept`,
-    { source_amount: sourceAmount },
-  );
-  return instructions;
+  return bitsoRequest<BitsoDepositInstructions>('POST', '/mxnb/deposit', {
+    source_amount: amountMXN,
+  });
 }
 
-export async function checkDepositStatus(
+export async function checkMxnbDepositStatus(
   depositId: string,
 ): Promise<BitsoDepositStatus> {
-  const status = await bitsoRequest<BitsoDepositStatus>(
-    'GET',
-    `/fx/deposit/${depositId}`,
-  );
-  return status;
+  return bitsoRequest<BitsoDepositStatus>('GET', `/mxnb/deposit/${depositId}`);
 }
 
 export function isBitsoConfigured(): boolean {

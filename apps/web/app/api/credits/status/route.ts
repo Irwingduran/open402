@@ -1,6 +1,6 @@
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
-import { checkDepositStatus } from '@/lib/bitso';
+import { checkMxnbDepositStatus } from '@/lib/bitso';
 
 export async function GET(req: Request) {
   const { userId } = await auth();
@@ -39,7 +39,7 @@ export async function GET(req: Request) {
   }
 
   try {
-    const deposit = await checkDepositStatus(depositId);
+    const deposit = await checkMxnbDepositStatus(depositId);
 
     if (deposit.status === 'confirmed') {
       const creditsAmount = transaction.amount;
