@@ -18,9 +18,16 @@ export function AgentList({ initialAgents }: { initialAgents: Agent[] }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name }),
       });
-      if (!res.ok) { alert('Error al crear agente'); return; }
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        alert(data.error || 'Error al crear agente');
+        return;
+      }
       const agent = await res.json();
       setAgents((prev) => [agent, ...prev]);
+    } catch (err) {
+      alert('Error de red al crear agente. ¿El servidor está corriendo?');
+      console.error(err);
     } finally {
       setCreating(false);
     }
@@ -30,9 +37,16 @@ export function AgentList({ initialAgents }: { initialAgents: Agent[] }) {
     setWalletsLoading((prev) => new Set(prev).add(agentId));
     try {
       const res = await fetch(`/api/agents/${agentId}/wallet`, { method: 'POST' });
-      if (!res.ok) { alert('Error al crear wallet'); return; }
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        alert(data.error || 'Error al crear wallet');
+        return;
+      }
       const updated = await res.json();
       setAgents((prev) => prev.map((a) => (a.id === agentId ? { ...a, walletAddress: updated.address } : a)));
+    } catch (err) {
+      alert('Error de red al crear wallet. ¿El servidor está corriendo?');
+      console.error(err);
     } finally {
       setWalletsLoading((prev) => { const next = new Set(prev); next.delete(agentId); return next; });
     }

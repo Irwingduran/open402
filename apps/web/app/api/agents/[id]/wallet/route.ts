@@ -25,40 +25,44 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   const apiKeyName = process.env.CDP_API_KEY_NAME;
   const apiKeyPrivateKey = process.env.CDP_API_KEY_PRIVATE_KEY;
 
-  if (!apiKeyName || !apiKeyPrivateKey) {
-    return Response.json({ error: 'CDP API keys not configured' }, { status: 500 });
-  }
+  let address: string;
 
-  try {
-    const { CdpWalletProvider } = await import('@coinbase/agentkit');
-    const walletProvider = await CdpWalletProvider.configureWithWallet({
-      apiKeyName,
-      apiKeyPrivateKey: apiKeyPrivateKey.replace(/\\n/g, '\n'),
-      networkId: agent.networkId,
-    });
-
-    const address = walletProvider.getAddress();
-
-    const wallet = await prisma.wallet.create({
-      data: {
-        userId,
-        agentId: id,
-        address,
+  if (apiKeyName && apiKeyPrivateKey) {
+    try {
+      const { CdpWalletProvider } = await import('@coinbase/agentkit');
+      const walletProvider = await CdpWalletProvider.configureWithWallet({
+        apiKeyName,
+        apiKeyPrivateKey: apiKeyPrivateKey.replace(/\\n/g, '\n'),
         networkId: agent.networkId,
-        walletType: 'agentic',
-      },
-    });
-
-    await prisma.agent.update({
-      where: { id },
-      data: { walletAddress: address },
-    });
-
-    return Response.json({ address: wallet.address }, { status: 201 });
-  } catch (err) {
-    return Response.json({
-      error: 'Error al crear wallet del agente',
-      details: String(err),
-    }, { status: 500 });
+      });
+      address = walletProvider.getAddress();
+    } catch (err) {
+      return Response.json({
+        error: 'Error al crear wallet del agente',
+        details: String(err),
+      }, { status: 500 });
+    }
+  } else {
+    // Mock wallet: deterministic address based on agent id
+    const { createHash } = await import('node:crypto');
+    const hash = createHash('sha256').update(`mock:${id}`).digest('hex');
+    address = '0x' + hash.slice(0, 40);
   }
+
+  const wallet = await prisma.wallet.create({
+    data: {
+      userId,
+      agentId: id,
+      address,
+      networkId: agent.networkId,
+      walletType: apiKeyName ? 'agentic' : 'mock',
+    },
+  });
+
+  await prisma.agent.update({
+    where: { id },
+    data: { walletAddress: address },
+  });
+
+  return Response.json({ address: wallet.address }, { status: 201 });
 }

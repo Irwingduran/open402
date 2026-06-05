@@ -9,7 +9,10 @@
     "typecheck": "pnpm -r --filter='./packages/*' run typecheck",
     "db:generate": "pnpm --filter @open402/db run generate",
     "db:push": "pnpm --filter @open402/db run push",
-    "db:studio": "pnpm --filter @open402/db run studio"
+    "db:studio": "pnpm --filter @open402/db run studio",
+    "dev:web": "pnpm --filter @open402/web dev",
+    "dev:bot": "pnpm --filter @open402/bot dev",
+    "dev:all": "pnpm run dev:web & pnpm run dev:bot & wait"
   },
   "devDependencies": {
     "typescript": "^5.5.0"

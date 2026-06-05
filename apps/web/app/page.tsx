@@ -4,6 +4,49 @@ import { Navbar } from '../components/navbar';
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
 import { useEffect, useRef, useState } from 'react';
 
+// ─── Telegram link handler ─────────────────────────────────────────────────────
+function TelegramLinkHandler() {
+  const [status, setStatus] = useState<'idle' | 'linking' | 'success' | 'error' | 'noauth'>('idle');
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const telegramId = params.get('telegram_id');
+    if (!telegramId) return;
+
+    setStatus('linking');
+    fetch('/api/telegram/link', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ telegramId }),
+    }).then(async (res) => {
+      if (res.status === 401) { setStatus('noauth'); return; }
+      if (!res.ok) { setStatus('error'); return; }
+      setStatus('success');
+      // Clean URL
+      const url = new URL(window.location.href);
+      url.searchParams.delete('telegram_id');
+      window.history.replaceState({}, '', url.toString());
+    }).catch(() => setStatus('error'));
+  }, []);
+
+  if (status === 'idle') return null;
+
+  return (
+    <div className="fixed top-0 left-0 right-0 z-50 px-4 py-3 text-center text-xs font-mono border-b"
+      style={{
+        background: status === 'success' ? '#ecfdf5' : status === 'error' || status === 'noauth' ? '#fef2f2' : '#fffbeb',
+        borderColor: status === 'success' ? '#a7f3d0' : status === 'error' || status === 'noauth' ? '#fecaca' : '#fde68a',
+        color: status === 'success' ? '#065f46' : status === 'error' || status === 'noauth' ? '#991b1b' : '#92400e',
+      }}
+    >
+      {status === 'linking' && '🔗 Vinculando cuenta de Telegram...'}
+      {status === 'success' && '✅ Cuenta de Telegram vinculada correctamente'}
+      {status === 'error' && '❌ Error al vincular cuenta de Telegram'}
+      {status === 'noauth' && '⚠️ Inicia sesión primero para vincular tu cuenta de Telegram'}
+    </div>
+  );
+}
+
 // ─── Animated counter ─────────────────────────────────────────────────────────
 function Counter({ to, suffix = '' }: { to: number; suffix?: string }) {
   const [val, setVal] = useState(0);
@@ -121,6 +164,7 @@ export default function Home() {
   return (
     <div className="bg-white text-slate-800 font-serif overflow-x-hidden">
 
+      <TelegramLinkHandler />
       <Navbar />
 
       {/* ── HERO ─────────────────────────────────────── */}

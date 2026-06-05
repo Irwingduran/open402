@@ -2,32 +2,40 @@ import { auth } from '@clerk/nextjs/server';
 import { redirect, notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { Navbar } from '../../../components/navbar';
+import { AgentExecuteForm } from '../../../components/agent-execute-form';
 
 export const dynamic = 'force-dynamic';
 
-export default async function AgentDetailPage({ params }: { params: { id: string } }) {
+export default async function AgentDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { userId } = await auth();
   if (!userId) redirect('/');
 
+  const { id } = await params;
+
   const agent = await prisma.agent.findUnique({
-    where: { id: params.id },
+    where: { id },
   });
 
   if (!agent || agent.userId !== userId) notFound();
 
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { credits: true },
+  });
+
   const rules = await prisma.spendingRule.findMany({
-    where: { userId, OR: [{ agentId: params.id }, { agentId: null }] },
+    where: { userId, OR: [{ agentId: id }, { agentId: null }] },
     orderBy: { createdAt: 'desc' },
   });
 
   const transactions = await prisma.transaction.findMany({
-    where: { agentId: params.id },
+    where: { agentId: id },
     orderBy: { createdAt: 'desc' },
     take: 20,
   });
 
   const wallet = await prisma.wallet.findFirst({
-    where: { agentId: params.id },
+    where: { agentId: id },
   });
 
   const serviceLabel = (v: string) => {
@@ -142,6 +150,11 @@ export default async function AgentDetailPage({ params }: { params: { id: string
               Ver historial completo &rarr;
             </a>
           </section>
+        </div>
+
+        {/* Execute form */}
+        <div className="mt-10 max-w-md">
+          <AgentExecuteForm agentId={id} credits={user?.credits ?? 0} />
         </div>
       </main>
     </div>
