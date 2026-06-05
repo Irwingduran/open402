@@ -2,7 +2,7 @@
 
 Infraestructura financiera para la economía de agentes autónomos.
 
-open402 permite que agentes AI ejecuten pagos de forma autónoma — servicios mexicanos (CFE, Telmex, Telcel), APIs vía protocolo x402 en Arbitrum, y cualquier integración futura — sin que el usuario toque una wallet, una llave privada o un exchange.
+open402 permite que agentes AI ejecuten pagos de forma autónoma — servicios mexicanos (CFE, Telmex, Telcel), APIs vía protocolo x402 en Arbitrum, y cualquier integración futura (sin que el usuario toque una wallet, una llave privada o un exchange).
 
 ---
 
