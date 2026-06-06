@@ -3,7 +3,7 @@
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
 
 type NavbarProps = {
-  active?: 'dashboard' | 'sdk' | 'credits';
+  active?: 'dashboard' | 'sdk' | 'credits' | 'invest';
   variant?: 'default' | 'landing';
 };
 
@@ -61,6 +61,12 @@ export function Navbar({ active, variant = 'default' }: NavbarProps) {
             className={`text-xs font-mono font-semibold no-underline ${active === 'credits' ? 'text-amber-500' : 'text-slate-500 hover:text-slate-800'} transition-colors`}
           >
             Créditos
+          </a>
+          <a
+            href="/invest"
+            className={`text-xs font-mono font-semibold no-underline ${active === 'invest' ? 'text-amber-500' : 'text-slate-500 hover:text-slate-800'} transition-colors`}
+          >
+            Inversiones
           </a>
           <a
             href="/sdk"

@@ -46,6 +46,10 @@ export default async function DashboardPage() {
     where: { userId },
   });
 
+  const investmentCount = await prisma.investment.count({
+    where: { userId },
+  });
+
   return (
     <div className="bg-white text-slate-800 font-sans min-h-screen overflow-x-hidden">
       <Navbar active="dashboard" />
@@ -73,6 +77,13 @@ export default async function DashboardPage() {
               <p className="text-[10px] font-mono text-slate-400 mb-1">Saldo</p>
               <p className="text-2xl font-extrabold text-slate-800">{user.credits.toLocaleString()}</p>
               <p className="text-[10px] font-mono text-amber-600 mt-1">Comprar &rarr;</p>
+            </div>
+          </a>
+          <a href="/invest" className="no-underline">
+            <div className="rounded-xl border border-black/10 bg-white p-5 hover:border-amber-200 hover:shadow-sm transition-all">
+              <p className="text-[10px] font-mono text-slate-400 mb-1">Inversiones</p>
+              <p className="text-2xl font-extrabold text-slate-800">{investmentCount}</p>
+              <p className="text-[10px] font-mono text-amber-600 mt-1">Invertir en CETES &rarr;</p>
             </div>
           </a>
         </div>

@@ -155,6 +155,7 @@ export default function Home() {
             { label: 'servicios reales', title: '400+ servicios mexicanos vía Prontipagos', desc: 'CFE, Telmex, Telcel, Izzi y 400 servicios más. <strong>Tu agente paga la luz el día 5 de cada mes, automáticamente</strong> — sin que el usuario haga nada. Eso no lo tiene ningún protocolo global.' },
             { label: 'protocolo x402', title: 'El estándar que ganó — y open402 ya lo habla', desc: 'x402 es el protocolo que Linux Foundation formalizó en abril 2026. Visa, Mastercard, Google, AWS y Stripe son miembros. <strong>open402 ya implementa x402 sobre Arbitrum</strong> con stablecoin MXM — primer proyecto LATAM-first sobre este estándar.' },
             { label: 'control del usuario', title: 'Policy engine granular — el agente nunca se pasa', desc: 'Tope diario, monto máximo por tx, confirmación obligatoria, pagos programados, alertas previas. <strong>Si el agente viola una regla, se detiene</strong> — no ejecuta y notifica. Las reglas son bloqueantes, no sugerencias.' },
+            { label: 'inversión automatizada', title: 'Inversión en CETES vía Etherfuse', desc: 'Tu agente puede invertir en CETES — el activo libre de riesgo de México — directamente desde el bot o dashboard. <strong>~10% APY nominal, stablebonds en Solana</strong>, sin salir de la app. Automatizable con reglas de gasto.' },
           ].map(({ label, title, desc }) => (
             <div key={label} className="grid grid-cols-[160px_1fr] border-b border-black/[0.09] last:border-b-0">
               <div className="font-mono text-[10px] tracking-[0.06em] text-ink-4 px-[14px] py-4 border-r border-black/[0.09] leading-relaxed">{label}</div>
@@ -414,6 +415,7 @@ await agent.payService({ provider: 'cfe', reference: '123456789' });`}
             { feature: 'Protocolo x402 nativo', us: '✓ Arbitrum · MXM', them: 'parcial / experimental', them2: '✗', usClass: 'text-green font-normal', themClass: 'text-ink-3' },
             { feature: 'Stablecoin mexicana (MXM)', us: '✓ MXM + MXNB', them: '✗ USD/EUR', them2: '✗ USD/EUR', usClass: 'text-green font-normal', themClass: 'text-[#c0392b] opacity-70' },
             { feature: 'Bot de Telegram + OCR', us: '✓ incluido', them: '✗', them2: '✗', usClass: 'text-green font-normal', themClass: 'text-[#c0392b] opacity-70' },
+            { feature: 'Inversión en CETES', us: '✓ Etherfuse', them: '✗', them2: '✗', usClass: 'text-green font-normal', themClass: 'text-[#c0392b] opacity-70' },
             { feature: 'Open source SDK', us: '✓', them: '✗ propietario', them2: '✗ propietario', usClass: 'text-green font-normal', themClass: 'text-[#c0392b] opacity-70' },
           ].map(({ feature, us, them, them2, usClass, themClass }) => (
             <div key={feature} className="grid grid-cols-4 border-b border-black/[0.09] last:border-b-0">
@@ -458,7 +460,7 @@ await agent.payService({ provider: 'cfe', reference: '123456789' });`}
         {/* TRUST */}
         <div className="flex items-center gap-1.5 flex-wrap justify-center mt-[18px] pt-[18px] border-t border-black/[0.09]">
           <span className="font-mono text-[9.5px] text-ink-4 tracking-[0.1em] mr-2">construido sobre</span>
-          {['Arbitrum One', 'Coinbase CDP', 'x402 Protocol', 'Prontipagos', 'Bitso MXNB', 'Ethereum', 'Opus 4.7'].map((item, i) => (
+          {['Arbitrum One', 'Coinbase CDP', 'x402 Protocol', 'Etherfuse', 'Prontipagos', 'Bitso MXNB', 'Ethereum', 'Opus 4.7'].map((item, i) => (
             <span key={item}>
               <span className="font-mono text-[10.5px] font-medium text-ink-3">{item}</span>
               {i < 5 && <span className="text-ink-4 text-[10px] mx-1">·</span>}
