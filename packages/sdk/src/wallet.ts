@@ -1,7 +1,7 @@
 import { WalletConfig, NetworkConfig, NETWORKS, DEFAULT_NETWORK } from './types';
 
 export interface WalletBalance {
-  usdc: bigint;
+  mxm: bigint;
   eth: bigint;
 }
 
@@ -31,10 +31,10 @@ export class AgentWallet {
   }
 
   async getBalance(): Promise<WalletBalance> {
-    return { usdc: 0n, eth: 0n };
+    return { mxm: 0n, eth: 0n };
   }
 
-  async sendUSDC(to: `0x${string}`, amount: string): Promise<`0x${string}`> {
+  async sendMXM(to: `0x${string}`, amount: string): Promise<`0x${string}`> {
     return '0x';
   }
 

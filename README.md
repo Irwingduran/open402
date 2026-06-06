@@ -19,17 +19,17 @@ Usuario ──► Dashboard Web (Next.js) ──► API ──► PostgreSQL
 
 ### Flujo de pago
 
-1. **Créditos** — El usuario compra créditos (1 crédito ≈ $0.01 USD). Paga en MXN vía SPEI.
+1. **Créditos** — El usuario compra créditos (1 crédito ≈ $0.01 MXM). Paga en MXN vía SPEI.
 2. **Bitso / MXNB** — El backend convierte MXN → MXNB (stablecoin mexicana en Arbitrum). Este paso es asíncrono.
 3. **Reglas de gasto** — El usuario define reglas: servicio, monto máximo, confirmación obligatoria.
 4. **Ejecución** — El agente (o el bot) ejecuta un pago. Se validan reglas, se deducen créditos, se crea una transacción.
-5. **Liquidación** — Según el canal: x402 paga USDC en Arbitrum; Prontipagos paga servicios MX via API.
+5. **Liquidación** — Según el canal: x402 paga MXM en Arbitrum; Prontipagos paga servicios MX via API.
 
 ### Canales de pago
 
 | Canal | Qué paga | Cómo |
 |-------|----------|------|
-| **x402** | APIs (OpenAI, CoinGecko, Perplexity…) | HTTP 402 → pago USDC desde Agentic Wallet del agente en Arbitrum |
+| **x402** | APIs (OpenAI, CoinGecko, Perplexity…) | HTTP 402 → pago MXM desde Agentic Wallet del agente en Arbitrum |
 | **Prontipagos** | CFE, Telmex, Telcel, Izzi (400+ servicios MX) | API REST con créditos internos |
 
 ---
@@ -44,8 +44,8 @@ Usuario ──► Dashboard Web (Next.js) ──► API ──► PostgreSQL
 | Base de datos | PostgreSQL + Prisma ORM |
 | Wallets on-chain | Coinbase CDP (AgentKit MPC) |
 | Red | Arbitrum One / Arbitrum Sepolia |
-| Stablecoin | USDC (x402), MXNB (Bitso) |
-| FX on-ramp | Bitso FXaaS — SPEI → MXN → MXNB/USDC |
+| Stablecoin | MXM (x402), MXNB (Bitso) |
+| FX on-ramp | Bitso FXaaS — SPEI → MXN → MXNB/MXM |
 | Monorepo | pnpm workspaces |
 
 ---
@@ -87,17 +87,17 @@ open402/
 Los créditos son la capa de abstracción entre el usuario y la blockchain.
 
 ```
-Usuario —► MXN (SPEI) —► Bitso —► MXNB/USDC (Arbitrum)
+Usuario —► MXN (SPEI) —► Bitso —► MXNB/MXM (Arbitrum)
                                               │
-                                   Créditos internos (1:1 con USD)
+                                    Créditos internos (1:1 con MXM)
                                               │
 Agente ejecuta —► deduce créditos —► tx record —► on-chain settlement
 ```
 
-- 1 crédito = $0.01 USD
+- 1 crédito = $0.01 MXM
 - 100 créditos = $1 MXN
 - No se requiere wallet del usuario
-- El backend maneja la conversión MXN → USDC/MXNB de forma asíncrona
+- El backend maneja la conversión MXN → MXM/MXNB de forma asíncrona
 
 ---
 
@@ -135,7 +135,7 @@ Las Agentic Wallets se crean con Coinbase Developer Platform (MPC). El flujo x40
 
 1. El agente hace una request HTTP a una API
 2. La API responde con HTTP 402 (Payment Required)
-3. El agente firma una transferencia USDC desde su Agentic Wallet
+3. El agente firma una transferencia MXM desde su Agentic Wallet
 4. La transacción se envía a Arbitrum
 5. El agente reintenta la request con el proof de pago
 

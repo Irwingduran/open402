@@ -11,7 +11,7 @@ export type TransactionStatus =
   | 'failed'
   | 'cancelled';
 
-export type TransactionCurrency = 'credits' | 'USDC' | 'MXN';
+export type TransactionCurrency = 'credits' | 'MXM' | 'MXN';
 
 export interface Transaction {
   id: string;

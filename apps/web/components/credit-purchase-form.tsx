@@ -89,7 +89,7 @@ export function CreditPurchaseForm() {
           Recibirás <strong className="text-amber-600">{estimatedCredits.toLocaleString()} créditos</strong>
         </p>
         <p className="text-[10px] font-mono text-slate-400 mt-0.5">
-          1 crédito ≈ $0.01 USD · 1 MXN = 100 créditos
+          1 crédito ≈ $0.01 MXM · 1 MXN = 100 créditos
         </p>
       </div>
 
