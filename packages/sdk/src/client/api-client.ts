@@ -10,6 +10,7 @@ import {
   InvestCETESResult,
   CheckInvestmentResult,
 } from '../types';
+import type { WalletBalance } from '../wallet';
 
 export class ApiClient {
   private baseUrl: string;
@@ -103,5 +104,18 @@ export class ApiClient {
 
   checkInvestment(orderId: string): Promise<CheckInvestmentResult> {
     return this.request('GET', `/etherfuse/status?orderId=${orderId}`);
+  }
+
+  // Wallets
+  createWallet(networkId: string): Promise<{ address: `0x${string}` }> {
+    return this.request('POST', '/wallets', { networkId });
+  }
+
+  getWalletBalance(address: string): Promise<{ mxm: string; eth: string }> {
+    return this.request('GET', `/wallets/${address}/balance`);
+  }
+
+  transferMXM(from: string, to: string, amount: string): Promise<{ txHash: `0x${string}` }> {
+    return this.request('POST', '/wallets/transfer', { from, to, amount });
   }
 }

@@ -1,10 +1,11 @@
 import { X402PaymentRequest, X402PaymentResult, NetworkConfig } from '../types';
+import { AgentWallet } from '../wallet';
 
 export class X402PaymentHandler {
-  private network: NetworkConfig;
+  private wallet: AgentWallet;
 
-  constructor(network: NetworkConfig) {
-    this.network = network;
+  constructor(wallet: AgentWallet) {
+    this.wallet = wallet;
   }
 
   async pay(request: X402PaymentRequest): Promise<X402PaymentResult> {
@@ -105,12 +106,13 @@ export class X402PaymentHandler {
     amount: string;
     payTo: string;
   }): Promise<string | undefined> {
-    return undefined;
+    const txHash = await this.wallet.sendMXM(payload.payTo as `0x${string}`, payload.amount);
+    return txHash;
   }
 
   private buildPaymentSignature(
     payload: { network: string; asset: string; amount: string; payTo: string },
-    _txHash?: string
+    txHash?: string
   ): string {
     const signaturePayload = {
       x402Version: 2,
@@ -122,9 +124,9 @@ export class X402PaymentHandler {
         payTo: payload.payTo,
       },
       payload: {
-        signature: '0x',
+        signature: txHash ? `${txHash}` : '0x',
         authorization: {
-          from: '0x',
+          from: this.wallet.address,
           to: payload.payTo,
           value: payload.amount,
           validAfter: Math.floor(Date.now() / 1000).toString(),

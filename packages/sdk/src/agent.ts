@@ -42,7 +42,7 @@ export class Agent {
     this.policies = new PolicyEngine(policies);
     this.client = client;
     this.billPayments = new BillPaymentHandler(client, id);
-    this.x402Payments = new X402PaymentHandler(wallet.network);
+    this.x402Payments = new X402PaymentHandler(wallet);
   }
 
   async payBill(request: BillPaymentRequest): Promise<BillPaymentResult> {

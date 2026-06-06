@@ -36,7 +36,7 @@ export class AgentX {
       networkId: 'arbitrum-mainnet',
     };
 
-    const wallet = await AgentWallet.create(walletConfig);
+    const wallet = await AgentWallet.create(walletConfig, this.client);
     const serverAgent = await this.client.createAgent(name);
 
     const agent = new Agent(
@@ -59,7 +59,8 @@ export class AgentX {
 
     const wallet = await AgentWallet.import(
       { networkId: 'arbitrum-mainnet' },
-      serverAgent.address as `0x${string}`
+      serverAgent.address as `0x${string}`,
+      this.client
     );
 
     const policies = await this.client.listPolicies(id);
@@ -77,7 +78,8 @@ export class AgentX {
       if (!agent) {
         const wallet = await AgentWallet.import(
           { networkId: 'arbitrum-mainnet' },
-          sa.address as `0x${string}`
+          sa.address as `0x${string}`,
+          this.client
         );
         const policies = await this.client.listPolicies(sa.id);
         agent = new Agent(sa.id, sa.name, wallet, policies, this.client);
