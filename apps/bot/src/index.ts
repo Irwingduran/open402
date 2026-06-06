@@ -534,7 +534,7 @@ async function executeTool(name: string, args: Record<string, unknown>, user: an
             'Content-Type': 'application/json',
             Authorization: 'Bearer bot',
           },
-          body: JSON.stringify({ amountMXN: amount }),
+          body: JSON.stringify({ amountMXN: amount, userId: user.id }),
         });
         const data = await res.json();
 

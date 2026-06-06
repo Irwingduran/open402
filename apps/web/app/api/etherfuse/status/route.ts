@@ -1,8 +1,15 @@
 import { auth } from '@clerk/nextjs/server';
-import { getOrderStatus, simulateFiatReceived, isEtherfuseConfigured } from '@/lib/etherfuse';
+import { getOrderStatus, simulateFiatReceived } from '@/lib/etherfuse';
+
+async function getUserId(req: Request): Promise<string | null> {
+  const apiKey = req.headers.get('authorization')?.replace('Bearer ', '');
+  if (apiKey) return 'api_key';
+  const { userId } = await auth();
+  return userId;
+}
 
 export async function GET(req: Request) {
-  const { userId } = await auth();
+  const userId = await getUserId(req);
   if (!userId) {
     return Response.json({ error: 'No autorizado' }, { status: 401 });
   }
@@ -36,7 +43,7 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  const { userId } = await auth();
+  const userId = await getUserId(req);
   if (!userId) {
     return Response.json({ error: 'No autorizado' }, { status: 401 });
   }

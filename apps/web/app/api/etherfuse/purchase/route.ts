@@ -2,20 +2,20 @@ import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@open402/db';
 import { createQuote, createOrder, isEtherfuseConfigured, getEtherfuseOrgId } from '@/lib/etherfuse';
 
-async function getUserId(req: Request): Promise<string | null> {
+async function getUserId(req: Request, body: { userId?: string }): Promise<string | null> {
   const apiKey = req.headers.get('authorization')?.replace('Bearer ', '');
-  if (apiKey) return 'api_bot';
+  if (apiKey) return body.userId ?? null;
   const { userId } = await auth();
   return userId;
 }
 
 export async function POST(req: Request) {
-  const userId = await getUserId(req);
+  const body = await req.json();
+  const { amountMXN } = body;
+  const userId = await getUserId(req, body);
   if (!userId) {
     return Response.json({ error: 'No autorizado' }, { status: 401 });
   }
-
-  const { amountMXN } = await req.json();
 
   if (amountMXN < 100 || amountMXN > 50000) {
     return Response.json({ error: 'Monto debe estar entre 100 y 50,000 MXN' }, { status: 400 });

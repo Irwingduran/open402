@@ -1,7 +1,7 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 
 const isPublicRoute = createRouteMatcher([
-  '/api/etherfuse/webhook(.*)',
+  '/api/etherfuse(.*)',
   '/_next/static/(.*)',
   '/favicon.ico',
 ]);
