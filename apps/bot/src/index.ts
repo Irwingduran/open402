@@ -1,8 +1,8 @@
 import { Bot, webhookCallback } from 'grammy';
 import { createServer } from 'node:http';
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import OpenAI from 'openai';
-import { prisma } from '@open402/db';
+import { prisma, InvestmentStatus } from '@open402/db';
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
 if (!token) throw new Error('TELEGRAM_BOT_TOKEN is required');
@@ -106,6 +106,34 @@ const TOOLS: OpenAI.ChatCompletionTool[] = [
           amount: { type: 'number', description: 'Monto en MXN' },
         },
         required: ['agentName', 'service', 'reference', 'amount'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'invest_in_cetes',
+      description: 'Invertir en CETES a través de Etherfuse. Genera una orden de compra de stablebonds respaldados por CETES y devuelve la CLABE para depositar.',
+      parameters: {
+        type: 'object',
+        properties: {
+          amount: { type: 'number', description: 'Monto en MXN a invertir (mínimo 100, máximo 50,000)' },
+        },
+        required: ['amount'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'check_investment',
+      description: 'Consultar el estado de una inversión en CETES. Si no se proporciona orderId, devuelve la inversión más reciente.',
+      parameters: {
+        type: 'object',
+        properties: {
+          orderId: { type: 'string', description: 'ID de la orden (opcional — si se omite, devuelve la última inversión)' },
+        },
+        required: [],
       },
     },
   },
@@ -305,8 +333,10 @@ bot.on('message:text', async (ctx) => {
         `\n- Si el usuario confirma un pago (sí, ok, dale), ejecuta execute_payment con los datos acordados.` +
         `\n- NO inventes montos ni referencias. Pregunta si no los sabes.` +
         `\n- *Después de crear un agente*, dile algo como: "Listo. ¿Quieres crear una regla de gasto? Por ejemplo: *crea una regla para CFE de \$500*".` +
-        `\n- *Después de crear una regla*, dile: "Perfecto. Ahora puedes enviarme la foto de un recibo o decirme *paga [servicio] ref [número] por \$[monto]*".` +
-        `\n- NO preguntes "qué sigue?" o "qué más?". Siempre da una opción concreta.` +
+      `\n- *Después de crear una regla*, dile: "Perfecto. Ahora puedes enviarme la foto de un recibo o decirme *paga [servicio] ref [número] por \$[monto]*".` +
+      `\n- Si el usuario quiere invertir en CETES (ej: "invierte \$500 en cetes" o "compra cetes"), usa invest_in_cetes con el monto.` +
+      `\n- Si el usuario pregunta por el estado de su inversión (ej: "cómo va mi orden", "cómo va mi inversión"), usa check_investment. Si menciona un ID específico, pásalo como orderId.` +
+      `\n- NO preguntes "qué sigue?" o "qué más?". Siempre da una opción concreta.` +
         context,
     },
     { role: 'user', content: text },
@@ -431,6 +461,112 @@ async function executeTool(name: string, args: Record<string, unknown>, user: an
       }
 
       return await deductAndRecord(user.id, agent.id, service, reference, amount, user.credits);
+    }
+
+    case 'check_investment': {
+      const orderId = args.orderId ? String(args.orderId) : undefined;
+
+      const investment = orderId
+        ? await prisma.investment.findUnique({ where: { orderId } })
+        : await prisma.investment.findFirst({
+            where: { userId: user.id },
+            orderBy: { createdAt: 'desc' },
+          });
+
+      if (!investment) {
+        return orderId
+          ? `No encontré una inversión con orden \`${orderId}\`.`
+          : 'No tienes inversiones registradas. ¿Quieres invertir en CETES?';
+      }
+
+      const statusEmoji: Record<string, string> = {
+        pending: '⏳',
+        awaiting_deposit: '💰',
+        completed: '✅',
+        failed: '❌',
+        cancelled: '🚫',
+      };
+      const statusLabel: Record<string, string> = {
+        pending: 'Pendiente',
+        awaiting_deposit: 'Esperando depósito',
+        completed: 'Completada',
+        failed: 'Fallida',
+        cancelled: 'Cancelada',
+      };
+
+      const emoji = statusEmoji[investment.status] ?? '📄';
+      const label = statusLabel[investment.status] ?? investment.status;
+
+      let msg = `${emoji} *Inversión en CETES*\n\n`;
+      msg += `Monto: \$${investment.amountMXN.toLocaleString()} MXN\n`;
+      msg += `Orden: \`${investment.orderId.slice(0, 8)}…\`\n`;
+      msg += `Estado: *${label}*\n`;
+
+      if (investment.cetesReceived) {
+        msg += `CETES recibidos: ${investment.cetesReceived.toFixed(2)}\n`;
+      }
+      if (investment.depositClabe) {
+        msg += `CLABE para depositar: \`${investment.depositClabe}\`\n`;
+      }
+      if (investment.status === 'awaiting_deposit' && investment.expiresAt && investment.expiresAt > new Date()) {
+        msg += `\n⏱️ Cotización válida hasta las ${investment.expiresAt.toLocaleTimeString('es-MX')}`;
+      }
+      if (investment.mock) {
+        msg += `\n\n⚠️ *Modo simulación* — sin API key real no hay depósito real.`;
+      }
+
+      return msg;
+    }
+
+    case 'invest_in_cetes': {
+      const amount = Number(args.amount) || 0;
+      if (amount < 100 || amount > 50000) {
+        return 'El monto debe estar entre 100 y 50,000 MXN.';
+      }
+      if (user.credits < amount) {
+        return `Saldo insuficiente. Tienes ${user.credits.toLocaleString()} créditos, necesitas ${amount}.`;
+      }
+
+      const quoteId = randomUUID();
+      const orderId = randomUUID();
+      const feeBps = 20;
+      const feeAmount = (amount * feeBps) / 10000;
+      const destinationAmount = amount - feeAmount;
+
+      const clabe = '646180115400345678';
+      const bankName = 'STP';
+      const accountHolder = 'Etherfuse MX';
+      const expiresAt = new Date(Date.now() + 120000);
+
+      await prisma.investment.create({
+        data: {
+          userId: user.id,
+          amountMXN: amount,
+          orderId,
+          quoteId,
+          status: InvestmentStatus.awaiting_deposit,
+          depositClabe: clabe,
+          depositBankName: bankName,
+          depositAccountHolder: accountHolder,
+          mock: true,
+          expiresAt,
+        },
+      });
+
+      return (
+        `📈 *Inversión en CETES*\n\n` +
+        `Monto: \$${amount.toLocaleString()} MXN\n` +
+        `Comisión (${feeBps} bps): \$${feeAmount.toFixed(2)} MXN\n` +
+        `Recibirás ≈ ${destinationAmount.toFixed(2)} CETES\n\n` +
+        `*Deposita a esta CLABE:*\n` +
+        `\`${clabe}\`\n` +
+        `Banco: ${bankName}\n` +
+        `Titular: ${accountHolder}\n\n` +
+        `Una vez que recibamos el depósito, tus CETES se acreditarán automáticamente.\n` +
+        `*Cotización válida por 2 minutos.*\n` +
+        `Para consultar el estado: *"¿cómo va mi orden ${orderId.slice(0, 8)}?"*\n\n` +
+        `⚠️ *Modo sandbox* — esta es una simulación. Sin API key real no deposites dinero real.`
+      );
     }
 
     default:
