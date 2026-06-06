@@ -527,46 +527,41 @@ async function executeTool(name: string, args: Record<string, unknown>, user: an
         return `Saldo insuficiente. Tienes ${user.credits.toLocaleString()} créditos, necesitas ${amount}.`;
       }
 
-      const quoteId = randomUUID();
-      const orderId = randomUUID();
-      const feeBps = 20;
-      const feeAmount = (amount * feeBps) / 10000;
-      const destinationAmount = amount - feeAmount;
+      try {
+        const res = await fetch(`${webappUrl}/api/etherfuse/purchase`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer bot',
+          },
+          body: JSON.stringify({ amountMXN: amount }),
+        });
+        const data = await res.json();
 
-      const clabe = '646180115400345678';
-      const bankName = 'STP';
-      const accountHolder = 'Etherfuse MX';
-      const expiresAt = new Date(Date.now() + 120000);
+        if (!res.ok || !data.success) {
+          return `Error al crear la orden: ${data.error ?? 'Error desconocido'}. Intenta de nuevo.`;
+        }
 
-      await prisma.investment.create({
-        data: {
-          userId: user.id,
-          amountMXN: amount,
-          orderId,
-          quoteId,
-          status: InvestmentStatus.awaiting_deposit,
-          depositClabe: clabe,
-          depositBankName: bankName,
-          depositAccountHolder: accountHolder,
-          mock: true,
-          expiresAt,
-        },
-      });
+        const order = data.order;
 
-      return (
-        `📈 *Inversión en CETES*\n\n` +
-        `Monto: \$${amount.toLocaleString()} MXN\n` +
-        `Comisión (${feeBps} bps): \$${feeAmount.toFixed(2)} MXN\n` +
-        `Recibirás ≈ ${destinationAmount.toFixed(2)} CETES\n\n` +
-        `*Deposita a esta CLABE:*\n` +
-        `\`${clabe}\`\n` +
-        `Banco: ${bankName}\n` +
-        `Titular: ${accountHolder}\n\n` +
-        `Una vez que recibamos el depósito, tus CETES se acreditarán automáticamente.\n` +
-        `*Cotización válida por 2 minutos.*\n` +
-        `Para consultar el estado: *"¿cómo va mi orden ${orderId.slice(0, 8)}?"*\n\n` +
-        `⚠️ *Modo sandbox* — esta es una simulación. Sin API key real no deposites dinero real.`
-      );
+        let msg =
+          `📈 *Inversión en CETES*\n\n` +
+          `Monto: \$${amount.toLocaleString()} MXN\n` +
+          `*Deposita a esta CLABE:*\n` +
+          `\`${order.depositClabe}\`\n` +
+          `Banco: ${order.depositBankName}\n` +
+          `Titular: ${order.depositAccountHolder}\n\n` +
+          `Una vez que recibamos el depósito, tus CETES se acreditarán automáticamente.\n` +
+          `Para consultar el estado: *"¿cómo va mi orden?"*\n`;
+
+        if (data.mock) {
+          msg += `\n⚠️ *Modo sandbox* — esta es una simulación. Sin API key real no deposites dinero real.`;
+        }
+
+        return msg;
+      } catch {
+        return 'Error de conexión con el servidor. Intenta de nuevo.';
+      }
     }
 
     default:
