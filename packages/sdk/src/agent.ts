@@ -9,6 +9,9 @@ import {
   X402PaymentRequest,
   X402PaymentResult,
   WalletConfig,
+  InvestCETESRequest,
+  InvestCETESResult,
+  CheckInvestmentResult,
 } from './types';
 import { ApiClient } from './client/api-client';
 import { PolicyEngine } from './policy-engine';
@@ -79,6 +82,14 @@ export class Agent {
 
   removeRule(id: string): boolean {
     return this.policies.removeRule(id);
+  }
+
+  async investInCETES(request: InvestCETESRequest): Promise<InvestCETESResult> {
+    return this.client.investInCETES(request);
+  }
+
+  async checkInvestment(orderId: string): Promise<CheckInvestmentResult> {
+    return this.client.checkInvestment(orderId);
   }
 
   toJSON(): Record<string, unknown> {

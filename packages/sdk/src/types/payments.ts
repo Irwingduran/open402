@@ -43,3 +43,32 @@ export interface CreditPurchaseResult {
   exchangeRate: number;
   transactionId: string;
 }
+
+export interface InvestCETESRequest {
+  amountMXN: number;
+}
+
+export interface InvestCETESResult {
+  success: boolean;
+  orderId: string;
+  depositClabe: string;
+  depositAmount: string;
+  depositBankName: string;
+  depositAccountHolder: string;
+  status: string;
+  mock: boolean;
+}
+
+export interface CheckInvestmentResult {
+  orderId: string;
+  status: string;
+  depositClabe?: string;
+  depositBankName?: string;
+  depositAccountHolder?: string;
+  amountInFiat?: string;
+  amountInTokens?: string;
+  confirmedTxSignature?: string;
+  createdAt?: string;
+  completedAt?: string;
+  statusPage?: string;
+}

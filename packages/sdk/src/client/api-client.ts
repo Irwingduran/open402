@@ -6,6 +6,9 @@ import {
   BillPaymentResult,
   CreditPurchaseRequest,
   CreditPurchaseResult,
+  InvestCETESRequest,
+  InvestCETESResult,
+  CheckInvestmentResult,
 } from '../types';
 
 export class ApiClient {
@@ -91,5 +94,14 @@ export class ApiClient {
   getTransactions(agentId: string, limit?: number): Promise<Transaction[]> {
     const query = limit ? `?limit=${limit}` : '';
     return this.request('GET', `/agents/${agentId}/transactions${query}`);
+  }
+
+  // Investments
+  investInCETES(input: InvestCETESRequest): Promise<InvestCETESResult> {
+    return this.request('POST', '/etherfuse/purchase', input);
+  }
+
+  checkInvestment(orderId: string): Promise<CheckInvestmentResult> {
+    return this.request('GET', `/etherfuse/status?orderId=${orderId}`);
   }
 }

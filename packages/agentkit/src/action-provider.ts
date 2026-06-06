@@ -13,6 +13,8 @@ import {
   GetHistorySchema,
   AddRuleSchema,
   RemoveRuleSchema,
+  InvestCETESSchema,
+  CheckInvestmentSchema,
 } from './schemas';
 
 export class AgentXActionProvider extends ActionProvider<WalletProvider> {
@@ -157,6 +159,62 @@ export class AgentXActionProvider extends ActionProvider<WalletProvider> {
       return `Removed rule ${args.ruleId}.`;
     }
     return `Rule ${args.ruleId} not found.`;
+  }
+
+  @CreateAction({
+    name: 'open402_invest_cetes',
+    description: 'Invest in CETES (Mexican government treasury bonds) via Etherfuse. Creates a purchase order and returns SPEI deposit instructions. Amount should be between 100 and 50,000 MXN.',
+    schema: InvestCETESSchema,
+  })
+  async investCETES(
+    _walletProvider: WalletProvider,
+    args: z.infer<typeof InvestCETESSchema>
+  ): Promise<string> {
+    try {
+      const result = await this.agent.investInCETES({ amountMXN: args.amountMXN });
+
+      if (result.success && result.depositClabe) {
+        return [
+          `Investment order created for $${args.amountMXN} MXN in CETES.`,
+          `Deposit via SPEI to CLABE: ${result.depositClabe}`,
+          `Bank: ${result.depositBankName}`,
+          `Account holder: ${result.depositAccountHolder}`,
+          `Amount: $${result.depositAmount} MXN`,
+          `Order ID: ${result.orderId}`,
+          result.mock ? '\n(Using mock mode — no real Etherfuse API key configured)' : '',
+        ].filter(Boolean).join('\n');
+      }
+
+      return `Failed to create investment order. Please try again.`;
+    } catch (error) {
+      return `Error investing in CETES: ${error instanceof Error ? error.message : 'Unknown error'}`;
+    }
+  }
+
+  @CreateAction({
+    name: 'open402_check_investment',
+    description: 'Check the status of a CETES investment order by its order ID. Returns current status, deposit info, and token details.',
+    schema: CheckInvestmentSchema,
+  })
+  async checkInvestment(
+    _walletProvider: WalletProvider,
+    args: z.infer<typeof CheckInvestmentSchema>
+  ): Promise<string> {
+    try {
+      const result = await this.agent.checkInvestment(args.orderId);
+
+      return [
+        `Investment order: ${result.orderId}`,
+        `Status: ${result.status}`,
+        result.depositClabe ? `Deposit CLABE: ${result.depositClabe}` : '',
+        result.amountInTokens ? `CETES received: ${result.amountInTokens}` : '',
+        result.amountInFiat ? `Amount: $${result.amountInFiat} MXN` : '',
+        result.completedAt ? `Completed at: ${result.completedAt}` : '',
+        result.statusPage ? `Status page: ${result.statusPage}` : '',
+      ].filter(Boolean).join('\n');
+    } catch (error) {
+      return `Error checking investment: ${error instanceof Error ? error.message : 'Unknown error'}`;
+    }
   }
 
   supportsNetwork = (network: Network) =>

@@ -29,3 +29,11 @@ export const AddRuleSchema = z.object({
 export const RemoveRuleSchema = z.object({
   ruleId: z.string(),
 });
+
+export const InvestCETESSchema = z.object({
+  amountMXN: z.number().positive().min(100).max(50000),
+});
+
+export const CheckInvestmentSchema = z.object({
+  orderId: z.string(),
+});
