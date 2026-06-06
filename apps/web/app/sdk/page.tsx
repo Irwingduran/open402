@@ -10,7 +10,7 @@ const packages = [
   },
   {
     name: '@open402/agentkit',
-    desc: 'Puente con Coinbase AgentKit. Provee AgentXActionProvider con 6 acciones listas para usar en agentes LangChain / Vercel AI.',
+    desc: 'Puente con Coinbase AgentKit. Provee AgentXActionProvider con 8 acciones (pay_bill, pay_x402, get_balance, get_history, add/remove_rule, invest_cetes, check_investment).',
     install: 'pnpm add @open402/agentkit',
   },
   {
@@ -102,6 +102,23 @@ const agentKit = await AgentKit.from({
 // Ahora el LLM puede llamar herramientas como
 // agentx_pay_bill, agentx_pay_x402, etc.`,
   },
+  {
+    title: 'Invertir en CETES',
+    code: `import { AgentX } from '@open402/agents';
+
+const agentx = await AgentX.create({ apiKey: 'sk_...' });
+const agent = await agentx.createAgent('Inversor');
+
+// Crea una orden de inversión en CETES
+const result = await agent.investInCETES({ amountMXN: 500 });
+
+console.log('CLABE:', result.depositClabe);
+console.log('Order ID:', result.orderId);
+
+// Consultar estado de la inversión
+const status = await agent.checkInvestment(result.orderId);
+console.log('Status:', status.status);`,
+  },
 ];
 
 export default function SDKPage() {
@@ -117,7 +134,7 @@ export default function SDKPage() {
             Documentación del SDK
           </h1>
           <p className="text-sm text-slate-500 m-0 leading-relaxed max-w-[520px] mx-auto">
-            Una línea de código y tu agente puede pagar APIs vía x402, servicios mexicanos (CFE, Telmex, Telcel, Izzi) y más. Sin wallets. Sin llaves privadas. Sin fricción.
+            Una línea de código y tu agente puede pagar APIs vía x402, servicios mexicanos (CFE, Telmex, Telcel, Izzi) e invertir en CETES. Sin wallets. Sin llaves privadas. Sin fricción.
           </p>
         </div>
       </section>
@@ -232,12 +249,12 @@ const agent = await agentx.createAgent('Mi Agente', {'{'}
               {
                 name: 'Agent',
                 desc: 'Representa un agente autónomo. Cada agente tiene su propia wallet (Agentic Wallet) y su policy engine.',
-                methods: ['payX402(request)', 'payService(request)', 'getBalance()', 'getHistory(limit?)', 'addRule(rule)', 'removeRule(ruleId)', 'listRules()'],
+                methods: ['payX402(request)', 'payService(request)', 'getBalance()', 'getHistory(limit?)', 'addRule(rule)', 'removeRule(ruleId)', 'listRules()', 'investInCETES(request)', 'checkInvestment(orderId)'],
               },
               {
                 name: 'AgentWallet',
                 desc: 'Wallet MPC del agente en Arbitrum o Base. Las claves viven en TEE (AWS Nitro Enclave). Nunca expuestas.',
-                methods: ['create(config)', 'import(config, address)', 'getAddress()', 'getBalance()', 'signTransfer(to, amount)'],
+                methods: ['create(config, client?)', 'import(config, address, client?)', 'getBalance()', 'sendMXM(to, amount)'],
               },
               {
                 name: 'PolicyEngine',
@@ -247,12 +264,12 @@ const agent = await agentx.createAgent('Mi Agente', {'{'}
               {
                 name: 'ApiClient',
                 desc: 'Cliente HTTP interno para comunicarse con la API de open402. Usado por AgentX automáticamente.',
-                methods: ['createAgent(name)', 'getBalance()', 'purchaseCredits(input)', 'payBill(agentId, request)', 'payX402(agentId, request)'],
+                methods: ['createAgent(name)', 'getBalance()', 'purchaseCredits(input)', 'payBill(agentId, request)', 'payX402(agentId, request)', 'investInCETES(input)', 'checkInvestment(orderId)', 'createWallet(networkId)', 'getWalletBalance(address)', 'transferMXM(from, to, amount)'],
               },
               {
                 name: 'X402PaymentHandler',
-                desc: 'Manejador del protocolo x402. Intercepta respuestas HTTP 402, extrae instrucciones de pago, ejecuta el pago y reintenta la request original.',
-                methods: ['handle(response, wallet)', 'pay(url, paymentInstruction)', 'retry(originalRequest, paymentResult)'],
+                desc: 'Manejador del protocolo x402. Intercepta respuestas HTTP 402, extrae instrucciones de pago, ejecuta el pago via wallet.sendMXM() y reintenta la request original.',
+                methods: ['pay(request)', 'parsePaymentRequired(header)', 'executePayment(payload)'],
               },
               {
                 name: 'BillPaymentHandler',
