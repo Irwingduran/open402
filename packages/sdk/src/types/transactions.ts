@@ -2,7 +2,8 @@ export type TransactionType =
   | 'credit_purchase'
   | 'credit_deduction'
   | 'x402_payment'
-  | 'bill_payment';
+  | 'bill_payment'
+  | 'investment';
 
 export type TransactionStatus =
   | 'pending'

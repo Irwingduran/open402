@@ -51,9 +51,15 @@ importers:
       '@open402/agents':
         specifier: workspace:*
         version: link:../../packages/sdk
+      '@open402/db':
+        specifier: workspace:*
+        version: link:../../packages/db
       '@prisma/client':
         specifier: ^5.14.0
         version: 5.22.0(prisma@5.22.0)
+      canonicalize:
+        specifier: ^3.0.0
+        version: 3.0.0
       next:
         specifier: ^14.2.0
         version: 14.2.35(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1267,6 +1273,11 @@ packages:
 
   canonicalize@2.1.0:
     resolution: {integrity: sha512-F705O3xrsUtgt98j7leetNhTWPe+5S72rlL5O4jA1pKqBVQ/dT1O1D6PFxmSXvc0SUOinWS57DKx0I3CHrXJHQ==}
+    hasBin: true
+
+  canonicalize@3.0.0:
+    resolution: {integrity: sha512-yYLfHyDMIXRyRqsKBRLX023riFLpXY2YOfdtqKXZRZy9qsfOJ9U+4F9YZL7MEzL5+ziN2x2nlBvY/Voi3EBljA==}
+    engines: {node: '>=18'}
     hasBin: true
 
   chalk@4.1.2:
@@ -3452,6 +3463,8 @@ snapshots:
   caniuse-lite@1.0.30001793: {}
 
   canonicalize@2.1.0: {}
+
+  canonicalize@3.0.0: {}
 
   chalk@4.1.2:
     dependencies:

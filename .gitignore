@@ -9,3 +9,4 @@ docs/
 video-generator/
 PROJECT.md
 web-dashboard-design.zip
+*.tsbuildinfo

@@ -31,6 +31,7 @@ Usuario ──► Dashboard Web (Next.js) ──► API ──► PostgreSQL
 |-------|----------|------|
 | **x402** | APIs (OpenAI, CoinGecko, Perplexity…) | HTTP 402 → pago MXM desde Agentic Wallet del agente en Arbitrum |
 | **Prontipagos** | CFE, Telmex, Telcel, Izzi (400+ servicios MX) | API REST con créditos internos |
+| **Etherfuse** | Tokenización — Inversión en CETES | Compra de stablebonds respaldados por CETES vía API REST |
 
 ---
 
@@ -46,6 +47,7 @@ Usuario ──► Dashboard Web (Next.js) ──► API ──► PostgreSQL
 | Red | Arbitrum One / Arbitrum Sepolia |
 | Stablecoin | MXM (x402), MXNB (Bitso) |
 | FX on-ramp | Bitso FXaaS — SPEI → MXN → MXNB/MXM |
+| Tokenized Assets | Etherfuse — CETES stablebonds on Solana |
 | Monorepo | pnpm workspaces |
 
 ---
@@ -63,6 +65,7 @@ open402/
 │   │   │   ├── rules/     # Reglas de gasto
 │   │   │   ├── transactions/ # Historial
 │   │   │   └── api/       # Rutas API (REST)
+│   │   │       └── etherfuse/ # Etherfuse/CETES investment API
 │   │   └── components/    # Componentes React
 │   │
 │   └── bot/               # Bot de Telegram
@@ -126,6 +129,8 @@ El modelo decide cuándo llamar cada tool:
 | `create_rule` | Crear regla de gasto |
 | `get_transactions` | Últimas transacciones |
 | `execute_payment` | Validar reglas, deducir créditos, ejecutar pago |
+| `invest_in_cetes` | Invertir en CETES — genera orden en Etherfuse y devuelve CLABE para depositar |
+| `check_investment` | Consultar estado de una inversión por orderId |
 
 ---
 
@@ -153,6 +158,53 @@ El on-ramp fiat funciona vía Bitso:
 4. Bitso convierte MXN → MXNB (stablecoin mexicana)
 5. MXNB se deposita en la pool wallet de open402 en Arbitrum
 6. Los créditos se acreditan al usuario
+
+---
+
+## Etherfuse — Inversión en CETES
+
+open402 integra **Etherfuse** para permitir la compra de stablebonds respaldados por CETES (Certificados de la Tesorería de México). Esto permite que los usuarios automaticen su inversión en el activo libre de riesgo mexicano directamente desde el bot o futura UI web.
+
+### Flujo de inversión
+
+1. Usuario solicita invertir una cantidad en CETES (ej. `invertir $500 en CETES`)
+2. El bot genera una cotización vía Etherfuse API (monto, tasa nominal, fees)
+3. El usuario confirma y se crea una orden, devolviendo un CLABE para depositar
+4. El usuario transfiere los MXN al CLABE vía SPEI
+5. Etherfuse recibe el depósito, ejecuta la compra del stablebond
+6. Un webhook actualiza el estado de la inversión en DB (`completed` + `cetesReceived`)
+7. El usuario puede consultar el estado con `check_investment`
+
+### APIs expuestas
+
+| Endpoint | Descripción |
+|----------|-------------|
+| `POST /api/etherfuse/purchase` | Crear cotización + orden de compra |
+| `GET /api/etherfuse/status` | Consultar estado de una orden |
+| `POST /api/etherfuse/webhook` | Webhook para recibir actualizaciones de orden |
+| `POST /api/etherfuse/webhook/register` | Registrar webhook con Etherfuse |
+
+### Arquitectura
+
+```
+Usuario ──► Bot / API ──► Etherfuse (sandbox)
+    │                           │
+    │                    Cotización → Orden → CLABE
+    │                           │
+    └── SPEI ──► Depósito ──►  │
+                               │
+                    Webhook ◄──┘
+                         │
+                    Actualiza DB (Investment)
+```
+
+### Entorno
+
+| Variable | Propósito |
+|----------|-----------|
+| `ETHERFUSE_API_KEY` | API key de sandbox o producción |
+| `ETHERFUSE_API_URL` | URL base (default: `https://api.sand.etherfuse.com`) |
+| `ETHERFUSE_WEBHOOK_SECRET` | Secreto HMAC para verificar webhooks |
 
 ---
 
@@ -188,11 +240,13 @@ cp packages/db/.env.example packages/db/.env
 # Editar .env.local con tus keys:
 # - NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
 # - CLERK_SECRET_KEY
+# - ETHERFUSE_API_KEY (para inversión en CETES)
 # - TELEGRAM_BOT_TOKEN (opcional, solo para webhook linking)
 
 # Editar apps/bot/.env con:
 # - TELEGRAM_BOT_TOKEN
 # - OPENAI_API_KEY
+# - ETHERFUSE_API_KEY
 # - DATABASE_URL
 # - WEBAPP_URL
 

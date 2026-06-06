@@ -135,6 +135,21 @@ interface EtherfuseStablebondsResponse {
   stablebonds: EtherfuseStablebond[];
 }
 
+interface EtherfuseWebhookRequest {
+  id: string;
+  eventType: 'bank_account_updated' | 'customer_updated' | 'order_updated' | 'swap_updated' | 'kyc_updated';
+  url: string;
+}
+
+interface EtherfuseWebhookResponse {
+  id: string;
+  eventType: string;
+  url: string;
+  secret: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 const IS_MOCK = !ETHERFUSE_API_KEY;
 
 function extractOrgId(): string {
@@ -328,6 +343,17 @@ async function handleMockRequest<T>(
     return order as T;
   }
 
+  if (method === 'POST' && path === '/ramp/webhook') {
+    return {
+      id: body?.id as string ?? generateId(),
+      eventType: body?.eventType as string ?? 'order_updated',
+      url: body?.url as string ?? 'https://example.com/webhook',
+      secret: Buffer.from(`mock_secret_${generateId()}`).toString('base64'),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    } as T;
+  }
+
   throw new Error(`Mock not implemented: ${method} ${path}`);
 }
 
@@ -363,6 +389,10 @@ export async function getOrderStatus(orderId: string): Promise<EtherfuseOrder> {
   return etherfuseRequest<EtherfuseOrder>('GET', `/ramp/order/${orderId}`);
 }
 
+export async function createWebhook(req: EtherfuseWebhookRequest): Promise<EtherfuseWebhookResponse> {
+  return etherfuseRequest<EtherfuseWebhookResponse>('POST', '/ramp/webhook', req as unknown as Record<string, unknown>);
+}
+
 export function isEtherfuseConfigured(): boolean {
   return !IS_MOCK;
 }
@@ -381,6 +411,8 @@ export type {
   EtherfuseOfframpOrderResponse,
   EtherfuseStablebond,
   EtherfuseStablebondsResponse,
+  EtherfuseWebhookRequest,
+  EtherfuseWebhookResponse,
   AssetBlockchain,
   QuoteType,
   OrderStatus,
