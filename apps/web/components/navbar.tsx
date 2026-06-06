@@ -17,11 +17,10 @@ export function Navbar({ active, variant = 'default' }: NavbarProps) {
         <div className="flex items-center gap-4">
           <a href="/sdk" className="text-xs font-mono font-semibold text-slate-500 no-underline hover:text-slate-800 transition-colors">docs</a>
           <a href="https://github.com/Irwingduran/open402.git" className="text-xs font-mono font-semibold text-slate-500 no-underline hover:text-slate-800 transition-colors">github</a>
-          <a href="/credits" className="text-xs font-mono font-semibold text-slate-500 no-underline hover:text-slate-800 transition-colors">créditos</a>
           <SignedOut>
             <SignInButton>
               <button className="text-xs font-mono font-bold px-[18px] py-2 rounded-lg bg-slate-900 text-white border-none cursor-pointer hover:bg-slate-700 transition-colors">
-                instalar SDK →
+                Comenzar →
               </button>
             </SignInButton>
           </SignedOut>

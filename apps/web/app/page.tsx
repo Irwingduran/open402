@@ -93,10 +93,6 @@ export default function Home() {
 
       {/* ── HERO ───────────────────────────────────── */}
       <section className="max-w-[680px] mx-auto px-5 py-14 pb-12 border-b border-black/[0.09]">
-        <div className="flex items-center gap-2 font-mono text-[10px] tracking-[0.1em] text-ink-4 mb-5">
-          <span className="w-[5px] h-[5px] rounded-full bg-amber flex-shrink-0" />
-          infraestructura · protocolo x402 · arbitrum · latam-first
-        </div>
 
         <h1 className="font-display text-[46px] leading-[1.04] tracking-tight text-ink m-0 mb-[18px]">
           Los agentes de AI<br />ya pueden pagar.<br /><em className="italic text-amber not-italic">Tú los controlas.</em>
