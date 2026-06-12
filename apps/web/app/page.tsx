@@ -3,7 +3,7 @@
 import { Navbar } from '../components/navbar';
 import { SignedIn, SignedOut, SignInButton } from '@clerk/nextjs';
 import { useEffect, useRef, useState } from 'react';
-
+ 
 // ─── Telegram link handler ─────────────────────────────────────────────────────
 function TelegramLinkHandler() {
   const [status, setStatus] = useState<'idle' | 'linking' | 'success' | 'error' | 'noauth'>('idle');
