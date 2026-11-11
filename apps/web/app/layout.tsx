@@ -1,5 +1,6 @@
 import { ClerkProvider } from '@clerk/nextjs';
 import type { ReactNode } from 'react';
+import { CLERK_ENABLED } from '../lib/clerk';
 import './globals.css';
 
 export const metadata = {
@@ -8,13 +9,13 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
-  return (
-    <ClerkProvider>
-      <html lang="es">
-        <body className="min-h-screen bg-gray-50 text-gray-900 antialiased">
-          {children}
-        </body>
-      </html>
-    </ClerkProvider>
+  const content = (
+    <html lang="es">
+      <body className="min-h-screen bg-gray-50 text-gray-900 antialiased">
+        {children}
+      </body>
+    </html>
   );
+
+  return CLERK_ENABLED ? <ClerkProvider>{content}</ClerkProvider> : content;
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
+import { SignedIn, SignedOut, SignInButton, UserButton } from './auth';
 
 type NavbarProps = {
   active?: 'dashboard' | 'sdk' | 'credits' | 'invest';

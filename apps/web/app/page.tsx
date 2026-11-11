@@ -1,7 +1,7 @@
 'use client';
 
 import { Navbar } from '../components/navbar';
-import { SignedIn, SignedOut, SignInButton } from '@clerk/nextjs';
+import { SignedIn, SignedOut, SignInButton } from '../components/auth';
 import { useEffect, useRef, useState } from 'react';
  
 // ─── Telegram link handler ─────────────────────────────────────────────────────
