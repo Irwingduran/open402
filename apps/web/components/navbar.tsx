@@ -17,13 +17,9 @@ export function Navbar({ active, variant = 'default' }: NavbarProps) {
         <div className="flex items-center gap-4">
           <a href="/sdk" className="text-xs font-mono font-semibold text-slate-500 no-underline hover:text-slate-800 transition-colors">docs</a>
           <a href="https://github.com/Irwingduran/open402.git" className="text-xs font-mono font-semibold text-slate-500 no-underline hover:text-slate-800 transition-colors">github</a>
-          <SignedOut>
-            <SignInButton>
-              <button className="text-xs font-mono font-bold px-[18px] py-2 rounded-lg bg-slate-900 text-white border-none cursor-pointer hover:bg-slate-700 transition-colors">
-                Comenzar →
-              </button>
-            </SignInButton>
-          </SignedOut>
+          <a href="/#demo" className="text-xs font-mono font-bold px-[18px] py-2 rounded-lg bg-slate-900 text-white no-underline hover:bg-slate-700 transition-colors">
+            Comenzar →
+          </a>
           <SignedIn>
             <a href="/dashboard" className="text-xs font-mono font-bold px-[18px] py-2 rounded-lg bg-slate-900 text-white no-underline hover:bg-slate-700 transition-colors">
               dashboard →

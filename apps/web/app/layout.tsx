@@ -4,8 +4,12 @@ import { CLERK_ENABLED } from '../lib/clerk';
 import './globals.css';
 
 export const metadata = {
-  title: 'open402',
-  description: 'Infraestructura financiera para agentes autónomos',
+  title: 'open402 — Pagos para agentes de IA, con reglas del usuario',
+  description: 'SDK abierto para que un agente de IA pague servicios en México dentro de límites que define el usuario.',
+  openGraph: {
+    title: 'open402 — Pagos para agentes de IA, con reglas del usuario',
+    description: 'SDK abierto para que un agente de IA pague servicios en México dentro de límites que define el usuario.',
+  },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
