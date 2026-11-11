@@ -402,30 +402,6 @@ await agent.payService({ provider: "cfe", reference: "..." })`}
             escríbenos." + correo o enlace */}
       </section>
 
-      {/* ── 12 · QUIÉN LO CONSTRUYE ────────────────── */}
-      <section className="max-w-[680px] mx-auto px-5 py-9 border-b border-black/[0.09]">
-        <span className="font-mono text-[10px] tracking-[0.1em] text-ink-4 block mb-[10px]">quién lo construye</span>
-        <p className="text-sm text-ink-3 font-[300] max-w-[540px] leading-relaxed m-0">
-          open402 lo desarrolla <strong className="font-medium text-ink">Irwing Duran Rugerio</strong>, ingeniero de software con más de cuatro años construyendo productos web, blockchain y agentes de IA. Fue co-fundador técnico de Urbánika y es mentor de hackathons, speaker e instructor.
-        </p>
-        {/* TODO(irwing): uno o dos logros concretos con número; enlaces a
-            irwingduran.com y GitHub */}
-      </section>
-
-      {/* ── 13 · MÁS ADELANTE ──────────────────────── */}
-      <section className="max-w-[680px] mx-auto px-5 py-9 border-b border-black/[0.09]">
-        <span className="font-mono text-[10px] tracking-[0.1em] text-ink-4 block mb-[10px]">más adelante</span>
-        <div className="flex flex-col gap-1.5">
-          {[
-            'Pagos entre agentes y APIs vía x402 como canal principal.',
-            'Rendimiento sobre el saldo en instrumentos respaldados por CETES.',
-            'Otros países de Latinoamérica.',
-          ].map((punto) => (
-            <p key={punto} className="font-mono text-[10.5px] text-ink-4 leading-relaxed m-0">— {punto}</p>
-          ))}
-        </div>
-      </section>
-
       {/* ── 14 · CIERRE Y PIE ──────────────────────── */}
       <section className="max-w-[680px] mx-auto px-5 py-14 pb-11 text-center">
         <h2 className="font-display text-[34px] leading-[1.08] text-ink m-0 mb-7">
